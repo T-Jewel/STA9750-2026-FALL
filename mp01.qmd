@@ -1,6 +1,879 @@
+---
+title: "Mini-Project 1: What We Watched: Exploring Netflix Viewing Data"
+format: html
+---
+   
+## Task 1, 2, & 3    
+     
+```{r}
+#' Acquire Netflix What We Watched Reports
+#' 
+#' This function will acquire and standardize all data for MP#01
+#' from Netflix. Because Netflix hosts the data files behind a CDN, we
+#' are accessing the release pages and automatically extracting links to the
+#' relevant files (with CDN hash). 
+#' 
+#' After import, files are stacked vertically and some basic cleaning is
+#' performed. 
+load_netflix_data <- function(){
+  # Note to students: Make sure you have installed the tidyverse and fs packages
+  #                   before beginning this assignment. If you aren't sure,
+  #                   simply run `library(tidyverse)` at your R Console and, if
+  #                   you don't see an error message, `tidyverse` has been 
+  #                   installed. (Same for `fs`) If you still need to install
+  #                   either package, use the `install.packages` function as 
+  #                   demonstrated in class.
+  library(tidyverse)
+  library(rvest)
+  library(readxl)
+  library(fs)
+  
+  data_dir <- path("data", "mp01")
+    
+  if(!dir_exists(data_dir)){
+    dir_create(data_dir, showWarnings=FALSE, recurse=TRUE)
+  }
+  
+  NETFLIX_URLS <- list(
+    `2023H1` = "https://about.netflix.com/news/what-we-watched-a-netflix-engagement-report",
+    `2023H2` = "https://about.netflix.com/news/what-we-watched-the-second-half-of-2023",
+    `2024H1` = "https://about.netflix.com/news/what-we-watched-the-first-half-of-2024",
+    `2024H2` = "https://about.netflix.com/news/what-we-watched-the-second-half-of-2024",
+    `2025H1` = "https://about.netflix.com/news/what-we-watched-the-first-half-of-2025",
+    `2025H2` = "https://about.netflix.com/news/what-we-watched-the-second-half-of-2025",
+    `2026H1` = "https://about.netflix.com/news/what-we-watched-the-first-half-of-2026"
+  )
+  
+  download_if_needed <- function(url, local){
+    if(!file_exists(local)){
+      download.file(url, local, quiet = TRUE, mode = "wb")
+    }
+    
+    return(local)
+  }
+    
+  NETFLIX_URLS |> 
+    map(read_html) |> 
+    map(html_element, xpath = "//a[contains(@href, '.xlsx')]") |> 
+    map_chr(html_attr, "href") |> 
+    enframe("period", "url") |> 
+   mutate(path = path(data_dir, paste0(period, ".xlsx")), 
+          path = map2(url, path, download_if_needed), 
+          data = map(path, read_excel, skip=3, na="*"), 
+          data = map(data, \(x) x |> mutate(`Release Date` = as.Date(`Release Date`)))) |>
+    unnest(data) |> 
+    select(-url, -path) |> 
+    mutate(year=str_sub(period, 1, 4), 
+           half=str_sub(period, start=6), 
+           period_start = make_date(year, if_else(half==1, 1, 7), 1), 
+           period_end = make_date(year, if_else(half==1, 7, 12), if_else(half==1, 30, 31))) |> 
+    filter(!is.na(`Hours Viewed`)) |> 
+    mutate(live_event = !is.na(Runtime) & str_detect(Runtime, "\\d+:\\d+\\*"), 
+           clean_time = str_remove(Runtime, fixed("*")),
+           Runtime = 60 * hour(hm(clean_time)) + minute(hm(clean_time))) |>
+    select(-clean_time) |>
+    mutate(Runtime = coalesce(Runtime, mean(Runtime, na.rm=TRUE)), 
+           .by=Title, 
+           Title = stringi::stri_trans_general(Title, "Latin-ASCII"),
+           Title = str_remove(Title, " // .*"), 
+           Title = str_remove(Title, "[^[:ascii:]].*"), 
+           Title = str_trim(Title)) |>
+    filter_out(Title == "") |>
+    select(year, 
+           period, 
+           period_start, 
+           period_end, 
+           Title, 
+           -half, 
+           Runtime, 
+           Views, 
+           `Hours Viewed`, 
+           `Release Date`,
+           `Available Globally?`, 
+           live_event) |>
+           
+# Data Cleaning and Preparation
 
-    ---
-    title: "Mini-Project Placeholder"
-    ---
-This is a placeholder for STA9750 Mini-Project 1. Check back soon for more!
+# Task 2 Fixing column titles for easy data manipulation
+# Note: run_time is measured in minutes
+        
+    rename(
+           title = Title,
+           run_time = Runtime,
+           views = Views,
+           hours_viewed = `Hours Viewed`,
+           release_date = `Release Date`,
+           available_globally = `Available Globally?`) |>
+           
+# Task 3 Fixing column types in order to properly perform future analysis. 
 
+    mutate(
+           year = as.integer(year),
+           available_globally = available_globally == "Yes")
+           
+
+}
+
+NETFLIX_DATA <- load_netflix_data()
+```
+
+## Task 4
+
+```{r}
+# Initial Data Exploration
+
+# Task 4 Initial EDA Pass; Getting familiar with data set. 
+# Making sure variables types aligns with expectations.
+# Taking note of any "missing" values.
+
+glimpse(NETFLIX_DATA)
+ 
+# install.packages("skimr")
+library(skimr)
+skim(NETFLIX_DATA)
+```
+
+We used the glimpse function to check if we mutated our desired columns properly. When we first inspected the data, we noticed that the "year" and "available_globally" column were interpreted as strings values. We want to make sure that the mutate function changed them to integer and logical values respectively. Ensuring that R is interpreting these two columns correctly will mitigate any potential issues when performing later analysis.
+Such analysis can involve looking over a period of time using the "year" column, or filtering out certain rows using the "available_globally" column.
+
+Another form of check that was utilized, is the skim function. Just like the glimpse function we can double check if R is interpreting our columns correctly. Furthermore, the table shows that certain columns have missing values, such as "run_time" or "views". Understanding this in advance well help us make better analytical decisions later on, and will provide some sensibility to unexpected results/observations. Finally, there is an overview of how the data in each column are behaving. For example, we can see that all numeric columns (expect "year") are heavily right skewed. This means that the majority of the observations have lower views, run times and hours viewed, while few of them are relatively in that higher range. Knowing this will once again help us get a better sense of future results. 
+
+## Task 5
+
+```{r}
+# Task 5 Exploratory Questions - Inline Values
+
+library(scales)
+```
+
+### Question 1: What date range is covered by this data set?
+
+```{r}
+date_range <- NETFLIX_DATA |>
+  summarise(
+    earliest_date = min(release_date, na.rm = TRUE),
+    latest_date = max(release_date, na.rm = TRUE)
+  )
+date_range
+```
+
+The date range covered in this data set is from `r date_range$earliest_date` to `r date_range$latest_date`. With this info we now know how far our data goes back. Also, we get an idea of how relevant our data will be in answering questions about current trends.  
+
+### Question 2: How many different shows and movies are covered in this data set?
+
+```{r}
+# Note: We filtered out the row "other shows" since this is accumulation of other shows and not a distinct title for a show or movie.
+number_of_titles <- NETFLIX_DATA |>
+  filter(title != "Other Shows") |>
+  summarise(number_of_titles = n_distinct(title)) |>
+  pull(number_of_titles)
+comma(number_of_titles)
+```
+
+The number of different shows and movies in this data set is `r comma(number_of_titles)`. Note that we excluded a row labeled "Other Shows". This row is an aggregated category of Netflix's other shows.
+For informational purpose we discovered that this row exist from performing one of the later analysis. Hence why we came back and slightly modified the code. The value from this code tells us how many unique observations there are. This can prove valuable later when trying to decide on omitting some observations when performing certain analysis. 
+
+### Question 3: How many total hours have been spent watching shows from the Bridgerton universe?
+
+```{r}
+bridgerton_hours <- NETFLIX_DATA |>
+  filter(str_detect(title, "Bridgerton")) |>
+  summarise(
+    total_hours = sum(hours_viewed, na.rm = TRUE)
+  ) |>
+  pull(total_hours)
+comma(bridgerton_hours)
+```
+
+The number of hours spent watching shows from the *Bridgerton Universe* is `r comma(bridgerton_hours)` hours. This value can give an idea of how certain observations accumulates to showing us the popularity of certain franchise. 
+
+### Question 4: How many total hours have been spent watching the five seasons of Stranger Things? For this question, we only want the “real” Stranger Things shows and not the companion behind-the-scenes show (“Beyond Stranger Things”), the animated spin-off (“Tales from ’85”), or the background music (“Stranger Things: Fireplace”).
+
+```{r}
+# This part of the code will tell us which "stranger Things" spin offs to filter out"  
+NETFLIX_DATA |>
+  filter(str_detect(title, "Stranger Things")) |>
+  distinct(title)
+  
+# Here we perform the actual calculation based on the info gathered from our prior code.
+stranger_things_hours <- NETFLIX_DATA |>
+  filter(str_detect(title, "Stranger Things")) |>
+  filter_out(title == "Beyond Stranger Things: Beyond 2") |>
+  filter_out(title == "Stranger Things: Fireplace") |>
+  filter_out(title == "Stranger Things: Tales From '85: Season 1") |>
+  summarise(
+    total_hours = sum(hours_viewed, na.rm = TRUE)
+  ) |>
+  pull(total_hours)
+comma(stranger_things_hours)
+```
+
+The number of hours spent watching the five seasons of *Stranger Things* is `r comma(stranger_things_hours)` hours. Unlike the prior question, we only focused on the main entries. This value can give us an idea of the popularity of certain franchises just based on their main shows.
+
+### Question 5: What percentage of total watch time was spent on the Top 10 titles of 2026H1?
+
+```{r}
+# This part of the code allows us to identify the top 10 titles for our desired period. 
+top10_2026H1 <- NETFLIX_DATA |>
+  filter(period == "2026H1") |>
+  arrange(desc(hours_viewed)) |>
+  slice_head(n = 10)
+
+# This shows us the actual top 10 list.We would want to doa brief visual inspection to make sure the list seems reasonable. 
+top10_2026H1 |>
+  select(title, hours_viewed)
+
+#Here we perform the actual calculation based on the info gathered from our prior code.
+
+# Numerator
+top10_hours <- top10_2026H1 |>
+  summarise(total_hours = sum(hours_viewed, na.rm = TRUE)) |>
+  pull(total_hours)
+
+# Denominator
+total_2026H1_hours <- NETFLIX_DATA |>
+  filter(period == "2026H1") |>
+  summarise(total_hours = sum(hours_viewed, na.rm = TRUE)) |>
+  pull(total_hours)
+
+# Final calculation
+top10_share <- top10_hours / total_2026H1_hours
+percent(top10_share, accuracy = 0.01)
+```
+
+The percentage of total watch time of the top 10 titles in the first half of 2026 is `r percent(top10_share, accuracy = 0.01)`. Note that this time we included the aggregated row "Other Shows" since we believe it is important to note that this category is part of the top 10 list. We can later find more information on this category and see what titles are included. Knowing this (along with the other titles) can help make better business decisions on figuring out which shows are more "attractive".
+
+### Question 6: What fraction of Netflix’s catalog is globally available? (Answer this both by title and weighted by hours viewed)
+
+```{r}
+#The following set of codes in this block will help us decide if we want to certain tiles or not.
+
+# Checks if any titles had their available_globally status change including if it had a missing value in that column. 
+NETFLIX_DATA |>
+  distinct(title, available_globally) |>
+  count(title, name = "number_of_statuses") |>
+  filter(number_of_statuses > 1)
+
+# Inspect some titles that had their available_globally status change across different periods. We can get an idea of when such tiles were globally available and when they were not.  
+NETFLIX_DATA |>
+  semi_join(
+    NETFLIX_DATA |>
+      distinct(title, available_globally) |>
+      count(title) |>
+      filter(n > 1),
+    by = "title"
+  ) |>
+  distinct(title, period, available_globally) |>
+  arrange(title, period) |>
+  print(n = 30)
+
+# Check which and if any titles had an NA status in their available_globally column
+NETFLIX_DATA |>
+  filter(is.na(available_globally)) |>
+  distinct(title, period, available_globally) |>
+  arrange(title, period)
+
+# Check which titles are globally available in all the periods that it appears
+globally_available_every_appearance <- NETFLIX_DATA |>
+  group_by(title) |>
+  summarise(
+    number_of_periods = n_distinct(period),
+    all_globally_available = all(available_globally %in% TRUE),
+    .groups = "drop"
+  ) |>
+  filter(all_globally_available) |>
+  arrange(title)
+globally_available_every_appearance
+```
+
+We decided to consider a title to be globally available, if it is marked "TRUE" under the "available_globally" column in at least one of the reporting periods that the title appears in. Although it may not always be globally available, the fact that it was available at some point contributes to the aggregated viewing hours for that specific title. This can helps us compare it (along with similar titles) to other titles that were never available globally. Thus, helping us make better business decisions. We are also excluding "Other Shows" since that is an aggregated category and has no "available globally" status.  
+
+```{r}
+# Calculating fraction by title
+title_catalog <- NETFLIX_DATA |>
+  filter(title != "Other Shows") |>
+  group_by(title) |>
+  summarise(
+    globally_available = any(available_globally %in% TRUE),
+    total_hours = sum(hours_viewed, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+title_fraction <- title_catalog |>
+  summarise(
+    total_titles = n(),
+    globally_available_titles = sum(globally_available),
+    fraction = globally_available_titles / total_titles
+  )
+
+title_fraction
+scales::percent(title_fraction$fraction, accuracy = 0.01)
+
+# Calculate fraction by weight (hours viewed)
+title_catalog <- NETFLIX_DATA |>
+  filter(title != "Other Shows") |>
+  group_by(title) |>
+  summarise(
+    globally_available_hours = sum(
+      hours_viewed[available_globally == TRUE],
+      na.rm = TRUE
+    ),
+    total_hours = sum(hours_viewed, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  mutate(
+    title_weight = globally_available_hours / total_hours
+  )
+hours_fraction <- title_catalog |>
+  summarise(
+    globally_available_hours = sum(globally_available_hours, na.rm = TRUE),
+    total_hours = sum(total_hours, na.rm = TRUE),
+    fraction = globally_available_hours / total_hours
+  )
+
+scales::percent(hours_fraction$fraction, accuracy = 0.01)
+```
+
+By title, the proportion of Netflix's catalog that is available globally is `r scales::percent(title_fraction$fraction, accuracy = 0.01)` and by weighted hours it's, `r scales::percent(hours_fraction$fraction, accuracy = 0.01)`. 
+This value help us get an idea of how popular globally available titles can be.
+
+## Task 6
+
+```{r}
+# Task 6 : Exploratory Questions - Table Answers
+
+#install.packages("gt")
+library(gt)
+```
+
+### Question 1: What was the top title (by total hours viewed) in each period and what fraction of total viewership did it capture?
+
+# LEFT OF HERE CONTINUE EDITING !!!! START WITH YOUR SECOND COMMENT AND DOUBLE CHECK YOUR FIRST COMMENT!!!
+```{r}
+# Creating a column for estimated views. This added column provide us values for any observations that has a missing value for their views column.
+NETFLIX_DATA_with_view_estimates <- NETFLIX_DATA |>
+  mutate(
+    estimated_views = if_else(
+      is.na(views) & !is.na(run_time) & run_time > 0,
+      hours_viewed / (run_time / 60),
+      NA_real_
+    )
+  )
+
+# Adding a view count column for the calculations. This column will prioritize the values provided to us by Netflix, while using the values that we calculated 
+NETFLIX_DATA_with_view_estimates <- NETFLIX_DATA_with_view_estimates |>
+  mutate(
+    views_to_use = coalesce(views, estimated_views)
+  )
+  
+# Finding top title by hours viewed and calculating its fraction of total viewership
+top_titles <- NETFLIX_DATA_with_view_estimates |>
+  group_by(period) |>
+  mutate(
+    total_views = sum(views_to_use, na.rm = TRUE)
+  ) |>
+  slice_max(
+    order_by = hours_viewed,
+    n = 1,
+    with_ties = FALSE
+  ) |>
+  mutate(
+    viewership_share = views_to_use / total_views
+  ) |>
+  ungroup() |>
+  select(
+    period,
+    title,
+    hours_viewed,
+    views,
+    estimated_views,
+    views_to_use,
+    total_views,
+    viewership_share
+  )
+  
+# Displaying the results in table format
+top_titles |>
+  gt() |>
+  cols_label(
+    period = "Reporting Period",
+    title = "Top Title by Hours Viewed",
+    hours_viewed = "Hours Viewed",
+    views = "Recorded Views",
+    estimated_views = "Estimated Views",
+    views_to_use = "Views Used",
+    total_views = "Total Views",
+    viewership_share = "Share of Viewership"
+  ) |>
+  fmt_number(
+    columns = c(
+      hours_viewed,
+      views,
+      estimated_views,
+      views_to_use,
+      total_views
+    ),
+    decimals = 0,
+    use_seps = TRUE
+  ) |>
+  fmt_percent(
+    columns = viewership_share,
+    decimals = 2
+  ) |>
+  tab_header(
+    title = "Top Title and Share of Viewership by Reporting Period"
+  )  
+```
+
+The table above shows the proportion of viewership associated with the top title (ranked by hours viewed) of each reporting period. The "Recorded Views" column consist of values that Netflix gave us. They are noted as "implied views" (computed by dividing Hours Viewed by run time) assuming that that all viewers watched the entirety of the said title. I use the same methodology to fill in the missing values for this column and labeled them as "Estimated Views". When performing the calculations to obtain the percentage, I use the estimated views **only if** the value under recorded views is missing. Otherwise I use the values that Netflix gave us. 
+
+```{r}
+# Question 2
+# Calculations
+catalog_size <- NETFLIX_DATA |>
+  filter(title != "Other Shows") |>
+  group_by(period) |>
+  summarise(
+    number_of_titles = n_distinct(title),
+    total_runtime_hours = sum(run_time, na.rm = TRUE) / 60,
+    .groups = "drop"
+  ) |>
+  arrange(period)
+
+#Creating the table
+catalog_size |>
+  gt() |>
+  cols_label(
+    period = "Reporting Period",
+    number_of_titles = "Number of Titles",
+    total_runtime_hours = "Total Runtime (Hours)"
+  ) |>
+  fmt_number(
+    columns = number_of_titles,
+    decimals = 0,
+    use_seps = TRUE
+  ) |>
+  fmt_number(
+    columns = total_runtime_hours,
+    decimals = 0,
+    use_seps = TRUE
+  ) |>
+  tab_header(
+    title = "Netflix Catalog Size Over Time",
+    subtitle = "Distinct titles and combined runtime by reporting period"
+  ) |>
+  opt_row_striping()
+```
+
+The table above shows the change in size of Netflix's catalog over the seven reporting periods. 
+In the table two measure of growth are presented, number of titles and run time (hours).
+Note we filtered out "Other Shows" being that row is an aggregation of multiple shows. 
+
+Interestingly, the table shows an unusual high number of titles for 2023H1 despite having the lowest run time when compared to other periods. In response, I performed three diagnostics below.
+
+The first looks at the original files and the column names for each period. The period 2023H1 does not have a run time column. Hence in the second diagnostic I looked at the processed data.
+
+The second diagnostic looked at the number of observations where they had missing run time. There is an unusual high number of observations with missing run time for 2023H1 relative to subsequent periods. 
+
+Finally, the third diagnostic looks at the original source file regarding the title counts and distinct rows. I wanted to check if any duplicates in 2023H1 are bleeding into the calculations. The table shows that does not seem to be the case. However the 2025 year shows 1 additional count in its original rows than distinct titles. the difference is minimal that I decided to ignore it. 
+
+All in all, I believe we should exclude 2023H1 when looking at the the change in size for the Netflix catalog. Nevertheless I still include it in the table for informational purposes. 
+
+If we were to look at all the other periods, we will see a consistent increase regarding both titles and total runt time. Having growth in both columns is expected and looks reasonable. 
+
+```{r}
+#Dianostic looking at original file's column names
+files <- fs::dir_ls("data/mp01", glob = "*.xlsx")
+
+for (file in files) {
+  cat("\nFile:", basename(file), "\n")
+  print(names(readxl::read_excel(file, skip = 3, na = "*")))
+}
+
+# Diagnostics worth investigating (Runtime)
+catalog_diagnostics <- NETFLIX_DATA |>
+  filter(title != "Other Shows") |>
+  group_by(period) |>
+  summarise(
+    number_of_titles = n_distinct(title),
+    missing_runtime = sum(is.na(run_time)),
+    total_rows = n(),
+    pct_missing_runtime = 100 * missing_runtime / total_rows,
+    .groups = "drop"
+  ) |>
+  arrange(period)
+
+catalog_diagnostics |>
+  gt() |>
+  cols_label(
+    period = "Reporting Period",
+    number_of_titles = "Distinct Titles",
+    missing_runtime = "Rows Missing Runtime",
+    pct_missing_runtime = "Runtime Missing (%)"
+  ) |>
+  fmt_number(
+    columns = c(number_of_titles, missing_runtime),
+    decimals = 0,
+    use_seps = TRUE
+  ) |>
+  fmt_number(
+    columns = pct_missing_runtime,
+    decimals = 1
+  ) |>
+  cols_hide(columns = total_rows) |>
+  tab_header(
+    title = "Diagnostic: Catalog Size and Runtime Completeness",
+    subtitle = "Investigating the unusually high 2023H1 values"
+  ) |>
+  opt_row_striping()
+
+# Diagnostics worth investigating (Title)
+data_2023H1 <- readxl::read_excel("data/mp01/2023H1.xlsx", skip = 3, na = "*")
+data_2023H2 <- readxl::read_excel("data/mp01/2023H2.xlsx", skip = 3, na = "*")
+data_2024H1 <- readxl::read_excel("data/mp01/2024H1.xlsx", skip = 3, na = "*")
+data_2024H2 <- readxl::read_excel("data/mp01/2024H2.xlsx", skip = 3, na = "*")
+data_2025H1 <- readxl::read_excel("data/mp01/2025H1.xlsx", skip = 3, na = "*")
+data_2025H2 <- readxl::read_excel("data/mp01/2025H2.xlsx", skip = 3, na = "*")
+data_2026H1 <- readxl::read_excel("data/mp01/2026H1.xlsx", skip = 3, na = "*")
+tibble(
+  period = c("2023H1", "2023H2", "2024H1", "2024H2",
+             "2025H1", "2025H2", "2026H1"),
+  original_rows = c(
+    nrow(data_2023H1), nrow(data_2023H2),
+    nrow(data_2024H1), nrow(data_2024H2),
+    nrow(data_2025H1), nrow(data_2025H2),
+    nrow(data_2026H1)
+  ),
+  original_distinct_titles = c(
+    n_distinct(data_2023H1$Title),
+    n_distinct(data_2023H2$Title),
+    n_distinct(data_2024H1$Title),
+    n_distinct(data_2024H2$Title),
+    n_distinct(data_2025H1$Title),
+    n_distinct(data_2025H2$Title),
+    n_distinct(data_2026H1$Title)
+  )
+) |>
+  gt() |>
+  cols_label(
+    period = "Reporting Period",
+    original_rows = "Original Rows",
+    original_distinct_titles = "Original Distinct Titles"
+  ) |>
+  tab_header(
+    title = "Checking the Unusually High Title Count",
+    subtitle = "Counts from the original Excel files, before processing"
+  )
+```
+
+```{r}
+# Question 3
+# Calculations
+n_periods <- n_distinct(NETFLIX_DATA_with_view_estimates$period)
+
+title_consistency <- NETFLIX_DATA_with_view_estimates |>
+  filter(title != "Other Shows") |>
+  group_by(title) |>
+  summarise(
+    periods_available = sum(!is.na(views_to_use)),
+
+    average_views = if (all(is.na(views_to_use))) {
+      NA_real_
+    } else {
+      mean(views_to_use, na.rm = TRUE)
+    },
+
+    minimum_views = if (all(is.na(views_to_use))) {
+      NA_real_
+    } else {
+      min(views_to_use, na.rm = TRUE)
+    },
+
+    sd_views = if (sum(!is.na(views_to_use)) < 2) {
+      NA_real_
+    } else {
+      sd(views_to_use, na.rm = TRUE)
+    },
+
+    .groups = "drop"
+  ) |>
+  filter(periods_available == n_periods) |>
+  arrange(desc(minimum_views))
+  
+# Table  
+title_consistency |>
+  gt() |>
+  cols_label(
+    title = "Title",
+    periods_available = "Periods Available",
+    average_views = "Average Views",
+    minimum_views = "Minimum Views",
+    sd_views = "Standard Deviation of Views"
+  ) |>
+  fmt_number(
+    columns = c(average_views, minimum_views, sd_views),
+    decimals = 0,
+    use_seps = TRUE
+  ) |>
+  fmt_number(
+    columns = periods_available,
+    decimals = 0,
+    use_seps = TRUE
+  ) |>
+  tab_header(
+    title = "Consistently Viewed Netflix Titles",
+    subtitle = "Viewership statistics across all seven reporting periods"
+  ) |>
+  opt_row_striping()
+```
+
+To see which show had the most consistently high viewership across all periods, I only looked at the shows that has available view counts across all 7 periods. The view counts are either the implied ones provided to us by Netflix, or the estimated ones that was calculated under Question 1 of Task 6. The table above lists all the shows that meets those criteria and is ranked by the highest minimum views.
+
+*Peppa Pig: Season 6*  had the highest minimum views out of all its 7 reporting periods when compared to other shows. This mean that ven its "worst' preriod this show was still out ranking the other shows in terms of minimum views.
+
+Out of curosity I wanted to see how this show will stand if we were to rank all teh shows by Average views. According to the table below we see it being the top 3. Therefore, I believe *Peppa Pig Saeson 6*  had consistently high viewership across all periods. 
+
+```{r}
+# Seeing the top 5 titles by Average Viewrship
+top_5_titles <- title_consistency |>
+  slice_max(order_by = average_views, n = 5, with_ties = TRUE)
+
+top_5_titles |>
+  gt() |>
+  cols_label(
+    title = "Title",
+    periods_available = "Periods Available",
+    average_views = "Average Views",
+    minimum_views = "Minimum Views",
+    sd_views = "Standard Deviation of Views"
+  ) |>
+  fmt_number(
+    columns = c(average_views, minimum_views, sd_views),
+    decimals = 0,
+    use_seps = TRUE
+  ) |>
+  fmt_number(
+    columns = periods_available,
+    decimals = 0,
+    use_seps = TRUE
+  ) |>
+  tab_header(
+    title = "Top 5 Netflix Titles by Average Viewership",
+    subtitle = "Viewership statistics across all seven reporting periods"
+  ) |>
+  opt_row_striping()
+```
+```{r}
+# Question 4
+
+# The purpose of this code, was to how many rows would be excluded based on certain criteria being put in place.This will help us make an analytical choice of whether we want to use these criteria. 
+
+NETFLIX_DATA_classified <- NETFLIX_DATA |>
+  mutate(
+    content_type = case_when(
+      str_detect(
+        title,
+        regex("Season|Episode|Limited Series", ignore_case = TRUE)
+      ) ~ "Show",
+      !is.na(run_time) & run_time > 240 ~ "Show",
+      !is.na(run_time) & run_time >= 90 & run_time <= 180 ~ "Movie",
+      TRUE ~ "Unclassified"
+    )
+  )
+NETFLIX_DATA_classified |>
+  count(content_type) |>
+  mutate(percentage = n / sum(n) * 100)
+  
+# The following code will use the dataset that we created (NETFLIX_DATA_Classified) to help us preform the necessary calculations.
+
+NETFLIX_DATA_for_analysis <- NETFLIX_DATA_classified |>
+  filter(content_type != "Unclassified")
+  
+viewing_by_type <- NETFLIX_DATA_for_analysis |>
+  group_by(period, content_type) |>
+  summarise(
+    total_hours_viewed = sum(hours_viewed, na.rm = TRUE),
+    .groups = "drop"
+  )
+  
+
+viewing_fractions <- viewing_by_type |>
+  group_by(period) |>
+  mutate(
+    fraction_of_viewing_time =
+      total_hours_viewed / sum(total_hours_viewed)
+  ) |>
+  ungroup()
+
+# Now we display the data in a table format for easily viewing it
+
+viewing_fractions |>
+  gt() |>
+  cols_label(
+    period = "Reporting Period",
+    content_type = "Content Type",
+    total_hours_viewed = "Total Hours Viewed",
+    fraction_of_viewing_time = "Fraction of Viewing Time"
+  ) |>
+  fmt_number(
+    columns = total_hours_viewed,
+    decimals = 0,
+    use_seps = TRUE
+  ) |>
+  fmt_percent(
+    columns = fraction_of_viewing_time,
+    decimals = 1
+  ) |>
+  tab_header(
+    title = "Netflix Viewing Time: Shows vs. Movies",
+    subtitle = "Viewing-time shares by reporting period, excluding unclassified titles"
+  ) |>
+  opt_row_striping()
+```
+
+That table above shows that viewers spent an unusual amount of time watching shows relative to movies for each period. Across all periods the proportion of time watching a movie are less than one percent. 
+
+Due to the unusual proportions, I conducted two additional checks/anlaysis to see what can be driving these numbers. The following check looked at missing values from our hours_viewed column. Note that this column is not from the initial data set (NETFLIX_DATA) but the modified data set that we used to perform our calculations (NETFLIX_DATA_for_analysis).    
+  
+```{r}
+# The following code helps us see if any missing values from the hours_viewed column is driving the results. 
+
+NETFLIX_DATA_for_analysis |>
+  group_by(period, content_type) |>
+  summarise(
+    rows = n(),
+    total_hours_viewed = sum(hours_viewed, na.rm = TRUE),
+    missing_hours_viewed = sum(is.na(hours_viewed)),
+    .groups = "drop"
+  ) |>
+  arrange(period, content_type)
+```
+
+The results above show that among the rows there aren't any with missing values for the hours_viewed column, meaning no exclusions were done in our actual analysis. Thus rows with missing values can not be the driver. 
+
+My next check/anlysis will look at the classification rules and see if any are driving the results.
+
+```{r}
+#The following code will help me see which classification rule is driving the large percentage of shows relative to movies.
+
+
+NETFLIX_DATA_classified |>
+  summarise(
+    season_titles = sum(
+      str_detect(title, regex("Season", ignore_case = TRUE)),
+      na.rm = TRUE
+    ),
+    episode_titles = sum(
+      !str_detect(title, regex("Season", ignore_case = TRUE)) &
+        str_detect(title, regex("Episode", ignore_case = TRUE)),
+      na.rm = TRUE
+    ),
+    limited_series_titles = sum(
+      !str_detect(title, regex("Season", ignore_case = TRUE)) &
+        !str_detect(title, regex("Episode", ignore_case = TRUE)) &
+        str_detect(title, regex("Limited Series", ignore_case = TRUE)),
+      na.rm = TRUE
+    ),
+    runtime_over_240 = sum(
+      !str_detect(title, regex("Season|Episode|Limited Series", ignore_case = TRUE)) &
+        !is.na(run_time) & run_time > 240,
+      na.rm = TRUE
+    )
+  )
+```
+
+We can see from the above code that the classification rule: **that if a title has the term "Season" in it, it is considered a show** , is driving our high percentage for classifying shows.
+
+Despite having unusual results I believe this table is accurate enough for this analysis, given the data we are working with. A quick inspection of the original data shows that any titles including the word "Season" is in fact a show.
+
+```{r}
+# Question 5
+
+# Create the dataset for this question
+
+NETFLIX_DATA_live_analysis <- NETFLIX_DATA_with_view_estimates |>
+  mutate(
+    content_category = case_when(
+      live_event == TRUE ~ "Live Event",
+      live_event == FALSE ~ "Pre-taped"
+    )
+  ) |>
+  filter(!is.na(views_to_use))
+  
+# Calculates average viewership
+live_average_viewership <- NETFLIX_DATA_live_analysis |>
+  group_by(content_category) |>
+  summarise(
+    number_of_rows = n(),
+    average_views = mean(views_to_use),
+    median_views = median(views_to_use),
+    total_views = sum(views_to_use),
+    .groups = "drop"
+  )
+  
+# Creating a table
+
+live_average_viewership |>
+  gt() |>
+  cols_label(
+    content_category = "Content Category",
+    number_of_rows = "Number of Rows",
+    average_views = "Average Views",
+    median_views = "Median Views",
+    total_views = "Total Views"
+  ) |>
+  fmt_number(columns = c(average_views, median_views, total_views),
+             decimals = 0, use_seps = TRUE) |>
+  fmt_number(columns = number_of_rows, decimals = 0, use_seps = TRUE) |>
+  tab_header(
+    title = "Average Viewership: Live Events vs. Pre-taped Content",
+    subtitle = "Recorded and estimated views across reporting periods"
+  ) |>
+  opt_row_striping()
+
+#Identifying top 10 events
+  
+live_top_tier <- NETFLIX_DATA_live_analysis |>
+  group_by(content_category) |>
+  slice_max(order_by = views_to_use, n = 10, with_ties = FALSE) |>
+  summarise(
+    number_of_rows = n(),
+    average_views = mean(views_to_use),
+    minimum_views = min(views_to_use),
+    maximum_views = max(views_to_use),
+    .groups = "drop"
+  )
+
+# Making the table for the top 10 events
+
+live_top_tier |>
+  gt() |>
+  cols_label(
+    content_category = "Content Category",
+    number_of_rows = "Rows in Top 10",
+    average_views = "Average Views in Top 10",
+    minimum_views = "Lowest Views in Top 10",
+    maximum_views = "Highest Views in Top 10"
+  ) |>
+  fmt_number(columns = c(average_views, minimum_views, maximum_views),
+             decimals = 0, use_seps = TRUE) |>
+  fmt_number(columns = number_of_rows, decimals = 0, use_seps = TRUE) |>
+  tab_header(
+    title = "Top-Tier Viewership: Live Events vs. Pre-taped Content",
+    subtitle = "Top 10 title-period rows in each category"
+  ) |>
+  opt_row_striping()
+```
+
+The first table compares the average viewership between live and pre-taped content, while the second compares the average among the top 10 for each category. 
+
+The first table tell us despite Netflix having far less live events relative to pre-taped, live events tend to have slightly higher average views. I also presented the median as another measurement since averages can be much more sensitive too outliers.
+
+When zoning in and seeing the top 10 events for both live and pre-taped category we see that the top 10 for pre taped events have a much higher average viewership than the top 10 for live events. 
+
+::: {.callout-note title="AI Usage Statement" collapse="true"}
+
+AI was used to write the code in this project (including text found inside tables), but all non-code text was generated without the use of any Generative AI tools. Additionally, AI was used to provide additional background information, help understand the code it was creating, and help understand the outputs the code was generating.
+
+:::
+  
