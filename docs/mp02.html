@@ -359,7 +359,7 @@ Caused by warning in `replace_na()`:
 ! NAs introduced by coercion</code></pre>
 </div>
 </div>
-<p>We received a warning when obtaining the second data set. The warning is saying that at least one of our values could not be converted into a number. The following code is to inspect it. We found the warning is regarding the mutate function that we are using. The column “Bio-Diesel Description” in our modified and raw data stood out the most being that the original values were strings, and the modified values are numerical with zeros. This column is the likely culprit. The other columns (with non numeric text values) were excluded during the data modification process, thus can not be the reason for the warning.</p>
+<p>We received a warning when obtaining the second data set. The warning is saying that at least one of our values could not be converted into a number. The following code is to inspect it. We found the warning is regarding the mutate function that we are using. The column “Bio-Diesel Description” in our modified and raw data stood out the most being that the original values are strings, and the modified values are numerical with zeros. This column is the likely culprit. The other columns (with non numeric text values) were excluded during the data modification process, thus can not be the reason for the warning.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>dplyr<span class="sc">::</span><span class="fu">last_dplyr_warnings</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -809,18 +809,18 @@ $ abbreviation          &lt;chr&gt; "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "D
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>EIA_SEP_REPORT <span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">5</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>  CO2_MWh primary_source electricity_price_MWh generation_MWh          state
-1     249  Hydroelectric                 101.3      102397711     Washington
-2     765    Natural gas                 125.3      266119236        Florida
-3    1126    Natural gas                 135.6        4799212       Delaware
-4     589        Nuclear                 109.0      100485416 South Carolina
-5     537    Natural gas                 196.6      129015493       New York
+<pre><code>  CO2_MWh primary_source electricity_price_MWh generation_MWh      state
+1     680           Wind                 112.1       57696155     Kansas
+2     765    Natural gas                 125.3      266119236    Florida
+3     249  Hydroelectric                 101.3      102397711 Washington
+4     631    Natural gas                 106.2      102698615   Virginia
+5     407    Natural gas                 270.4      214191383 California
   abbreviation
-1           WA
+1           KS
 2           FL
-3           DE
-4           SC
-5           NY</code></pre>
+3           WA
+4           VA
+5           CA</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(NTD_ENERGY)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -1210,11 +1210,11 @@ $ `Gallons of Liquified Petroleum Gas`    &lt;dbl&gt; 399385, 0, 0, 0, 0, 0, 0, 
 <pre><code># A tibble: 5 × 16
   `NTD ID` Mode  `Agency Name`     Gallons of Bio-Diese…¹ Bio-Diesel Descripti…²
      &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;                              &lt;dbl&gt;                  &lt;dbl&gt;
-1    90024 DR    City of La Mirada                      0                      0
-2        8 LR    Tri-County Metro…                      0                      0
-3    60114 DR    STAR Transit                           0                      0
-4    20003 MB    Broome County                          0                      0
-5    50099 MB    City of Eau Clai…                      0                      0
+1    40158 MB    Lake County Boar…                      0                      0
+2    80008 MB    City of Grand Fo…                   5581                      0
+3    50058 DR    Rockford Mass Tr…                      0                      0
+4    10005 DR    Lowell Regional …                      0                      0
+5    50184 MB    Macatawa Area Ex…                      0                      0
 # ℹ abbreviated names: ¹​`Gallons of Bio-Diesel`, ²​`Bio-Diesel Description`
 # ℹ 11 more variables: `Gallons of Bunker Fuel` &lt;dbl&gt;,
 #   `Gallons of Compressed Natural Gas` &lt;dbl&gt;, `Gallons of Diesel Fuel` &lt;dbl&gt;,
@@ -1611,11 +1611,11 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
 <pre><code># A tibble: 5 × 17
   NTD_ID AGENCY                reporter_type organization_type city  state mode 
   &lt;chr&gt;  &lt;chr&gt;                 &lt;chr&gt;         &lt;chr&gt;             &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
-1 60056  Dallas Area Rapid Tr… Full Reporter Independent Publ… Dall… TX    DR   
-2 50456  County of Allegan     Rural Report… City, County or … Alle… MI    DR   
-3 10061  Montachusett Regiona… Full Reporter Independent Publ… Fitc… MA    DR   
-4 99453  City of Winslow, dba… Rural Report… City, County or … Wins… AZ    DR   
-5 90039  City of Culver City,… Full Reporter City, County or … Culv… CA    MB   
+1 99442  Calaveras Transit Ag… Rural Report… Independent Publ… San … CA    DR   
+2 90017  City of Santa Rosa, … Full Reporter City, County or … Sant… CA    MB   
+3 60270  City of McKinney, db… Full Reporter City, County or … Mcki… TX    DR   
+4 40185  Bay County Transport… Full Reporter MPO, COG or Othe… Pana… FL    MB   
+5 60089  City of Tyler, dba: … Reduced Repo… City, County or … Tyler TX    DR   
 # ℹ 10 more variables: type_of_service &lt;chr&gt;, uza_code &lt;chr&gt;, uza_name &lt;chr&gt;,
 #   uza_sq_miles &lt;dbl&gt;, uza_population &lt;dbl&gt;, service_area_sq_miles &lt;dbl&gt;,
 #   service_area_population &lt;dbl&gt;, flagged_likely_inaccurate &lt;lgl&gt;,
@@ -1684,7 +1684,7 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
 17 YR   </code></pre>
 </div>
 </div>
-<p>Now that we know what coding to modify under the “mode” column for both datasets, we will now modify those values. Instead of altering the original modified datasets, we will create two new ones that will have those modified values, and will use those going forward.This will ensure that if anything goes wrong, we still have our original modified data and won’t have to re run any code regarding data acquisition or initial modification.</p>
+<p>Now that we know what coding to modify under the “mode” column for both datasets, we will modify those values. Instead of altering the original modified datasets, we will create two new ones that will have those modified values, and will use those going forward. This will ensure that if anything goes wrong, we still have our original modified data and won’t have to re run any code regarding data acquisition or initial modification.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>NTD_ENERGY_Modified <span class="ot">&lt;-</span> NTD_ENERGY <span class="sc">|&gt;</span></span>
 <span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Mode =</span> <span class="fu">recode_values</span>(Mode,</span>
@@ -1858,23 +1858,23 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
 <span id="cb61-33"><a href="#cb61-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">row.striping.background_color =</span> <span class="st">"#E8E8E8"</span></span>
 <span id="cb61-34"><a href="#cb61-34" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
-<div id="kswybxtgfs" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#kswybxtgfs table {
+<div id="qbzkkjpjgy" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#qbzkkjpjgy table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#kswybxtgfs thead, #kswybxtgfs tbody, #kswybxtgfs tfoot, #kswybxtgfs tr, #kswybxtgfs td, #kswybxtgfs th {
+#qbzkkjpjgy thead, #qbzkkjpjgy tbody, #qbzkkjpjgy tfoot, #qbzkkjpjgy tr, #qbzkkjpjgy td, #qbzkkjpjgy th {
   border-style: none;
 }
 
-#kswybxtgfs p {
+#qbzkkjpjgy p {
   margin: 0;
   padding: 0;
 }
 
-#kswybxtgfs .gt_table {
+#qbzkkjpjgy .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -1900,12 +1900,12 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   border-left-color: #D3D3D3;
 }
 
-#kswybxtgfs .gt_caption {
+#qbzkkjpjgy .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#kswybxtgfs .gt_title {
+#qbzkkjpjgy .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1917,7 +1917,7 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   border-bottom-width: 0;
 }
 
-#kswybxtgfs .gt_subtitle {
+#qbzkkjpjgy .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1929,7 +1929,7 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   border-top-width: 0;
 }
 
-#kswybxtgfs .gt_heading {
+#qbzkkjpjgy .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1941,13 +1941,13 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   border-right-color: #D3D3D3;
 }
 
-#kswybxtgfs .gt_bottom_border {
+#qbzkkjpjgy .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#kswybxtgfs .gt_col_headings {
+#qbzkkjpjgy .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1962,7 +1962,7 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   border-right-color: #D3D3D3;
 }
 
-#kswybxtgfs .gt_col_heading {
+#qbzkkjpjgy .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1982,7 +1982,7 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   overflow-x: hidden;
 }
 
-#kswybxtgfs .gt_column_spanner_outer {
+#qbzkkjpjgy .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1994,15 +1994,15 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   padding-right: 4px;
 }
 
-#kswybxtgfs .gt_column_spanner_outer:first-child {
+#qbzkkjpjgy .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#kswybxtgfs .gt_column_spanner_outer:last-child {
+#qbzkkjpjgy .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#kswybxtgfs .gt_column_spanner {
+#qbzkkjpjgy .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -2014,11 +2014,11 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   width: 100%;
 }
 
-#kswybxtgfs .gt_spanner_row {
+#qbzkkjpjgy .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#kswybxtgfs .gt_group_heading {
+#qbzkkjpjgy .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2044,7 +2044,7 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   text-align: left;
 }
 
-#kswybxtgfs .gt_empty_group_heading {
+#qbzkkjpjgy .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2059,15 +2059,15 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   vertical-align: middle;
 }
 
-#kswybxtgfs .gt_from_md > :first-child {
+#qbzkkjpjgy .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#kswybxtgfs .gt_from_md > :last-child {
+#qbzkkjpjgy .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#kswybxtgfs .gt_row {
+#qbzkkjpjgy .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2086,7 +2086,7 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   overflow-x: hidden;
 }
 
-#kswybxtgfs .gt_stub {
+#qbzkkjpjgy .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2099,7 +2099,7 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   padding-right: 5px;
 }
 
-#kswybxtgfs .gt_stub_row_group {
+#qbzkkjpjgy .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2113,15 +2113,15 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   vertical-align: top;
 }
 
-#kswybxtgfs .gt_row_group_first td {
+#qbzkkjpjgy .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#kswybxtgfs .gt_row_group_first th {
+#qbzkkjpjgy .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#kswybxtgfs .gt_summary_row {
+#qbzkkjpjgy .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2131,16 +2131,16 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   padding-right: 5px;
 }
 
-#kswybxtgfs .gt_first_summary_row {
+#qbzkkjpjgy .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#kswybxtgfs .gt_first_summary_row.thick {
+#qbzkkjpjgy .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#kswybxtgfs .gt_last_summary_row {
+#qbzkkjpjgy .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2150,7 +2150,7 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   border-bottom-color: #D3D3D3;
 }
 
-#kswybxtgfs .gt_grand_summary_row {
+#qbzkkjpjgy .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2160,7 +2160,7 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   padding-right: 5px;
 }
 
-#kswybxtgfs .gt_first_grand_summary_row {
+#qbzkkjpjgy .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2170,7 +2170,7 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   border-top-color: #D3D3D3;
 }
 
-#kswybxtgfs .gt_last_grand_summary_row_top {
+#qbzkkjpjgy .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2180,11 +2180,11 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   border-bottom-color: #D3D3D3;
 }
 
-#kswybxtgfs .gt_striped {
+#qbzkkjpjgy .gt_striped {
   background-color: #E8E8E8;
 }
 
-#kswybxtgfs .gt_table_body {
+#qbzkkjpjgy .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2193,7 +2193,7 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   border-bottom-color: #D3D3D3;
 }
 
-#kswybxtgfs .gt_footnotes {
+#qbzkkjpjgy .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2207,7 +2207,7 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   border-right-color: #D3D3D3;
 }
 
-#kswybxtgfs .gt_footnote {
+#qbzkkjpjgy .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -2216,7 +2216,7 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   padding-right: 5px;
 }
 
-#kswybxtgfs .gt_sourcenotes {
+#qbzkkjpjgy .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2230,7 +2230,7 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   border-right-color: #D3D3D3;
 }
 
-#kswybxtgfs .gt_sourcenote {
+#qbzkkjpjgy .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -2238,72 +2238,72 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   padding-right: 5px;
 }
 
-#kswybxtgfs .gt_left {
+#qbzkkjpjgy .gt_left {
   text-align: left;
 }
 
-#kswybxtgfs .gt_center {
+#qbzkkjpjgy .gt_center {
   text-align: center;
 }
 
-#kswybxtgfs .gt_right {
+#qbzkkjpjgy .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#kswybxtgfs .gt_font_normal {
+#qbzkkjpjgy .gt_font_normal {
   font-weight: normal;
 }
 
-#kswybxtgfs .gt_font_bold {
+#qbzkkjpjgy .gt_font_bold {
   font-weight: bold;
 }
 
-#kswybxtgfs .gt_font_italic {
+#qbzkkjpjgy .gt_font_italic {
   font-style: italic;
 }
 
-#kswybxtgfs .gt_super {
+#qbzkkjpjgy .gt_super {
   font-size: 65%;
 }
 
-#kswybxtgfs .gt_footnote_marks {
+#qbzkkjpjgy .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#kswybxtgfs .gt_asterisk {
+#qbzkkjpjgy .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#kswybxtgfs .gt_indent_1 {
+#qbzkkjpjgy .gt_indent_1 {
   text-indent: 5px;
 }
 
-#kswybxtgfs .gt_indent_2 {
+#qbzkkjpjgy .gt_indent_2 {
   text-indent: 10px;
 }
 
-#kswybxtgfs .gt_indent_3 {
+#qbzkkjpjgy .gt_indent_3 {
   text-indent: 15px;
 }
 
-#kswybxtgfs .gt_indent_4 {
+#qbzkkjpjgy .gt_indent_4 {
   text-indent: 20px;
 }
 
-#kswybxtgfs .gt_indent_5 {
+#qbzkkjpjgy .gt_indent_5 {
   text-indent: 25px;
 }
 
-#kswybxtgfs .katex-display {
+#qbzkkjpjgy .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#kswybxtgfs div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#qbzkkjpjgy div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -2359,17 +2359,18 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
 <section id="on-average-how-many-pounds-of-co2-are-emitted-per-mwh-of-electricity-produced-in-the-u.s.-note-that-we-will-need-use-a-suitably-weighted-average-here.-inline-answer" class="level4">
 <h4 class="anchored" data-anchor-id="on-average-how-many-pounds-of-co2-are-emitted-per-mwh-of-electricity-produced-in-the-u.s.-note-that-we-will-need-use-a-suitably-weighted-average-here.-inline-answer">On average, how many pounds of CO2 are emitted per MWh of electricity produced in the U.S.? (Note that we will need use a suitably weighted average here.) (Inline answer)</h4>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Here calculate the weighted average. The weight is based on the total amount of electricity that each state generates.</span></span>
-<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>EIA_US_CO2_AVERAGE <span class="ot">&lt;-</span> EIA_SEP_REPORT <span class="sc">|&gt;</span></span>
-<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
-<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">weighted_CO2_average =</span> <span class="fu">weighted.mean</span>(</span>
-<span id="cb62-6"><a href="#cb62-6" aria-hidden="true" tabindex="-1"></a>      CO2_MWh,</span>
-<span id="cb62-7"><a href="#cb62-7" aria-hidden="true" tabindex="-1"></a>      generation_MWh</span>
-<span id="cb62-8"><a href="#cb62-8" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb62-9"><a href="#cb62-9" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb62-10"><a href="#cb62-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb62-11"><a href="#cb62-11" aria-hidden="true" tabindex="-1"></a>EIA_US_CO2_AVERAGE</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Here we calculate the weighted average. </span></span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a><span class="co"># The weight is based on the total amount of electricity that each state generates.</span></span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>EIA_US_CO2_AVERAGE <span class="ot">&lt;-</span> EIA_SEP_REPORT <span class="sc">|&gt;</span></span>
+<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb62-6"><a href="#cb62-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">weighted_CO2_average =</span> <span class="fu">weighted.mean</span>(</span>
+<span id="cb62-7"><a href="#cb62-7" aria-hidden="true" tabindex="-1"></a>      CO2_MWh,</span>
+<span id="cb62-8"><a href="#cb62-8" aria-hidden="true" tabindex="-1"></a>      generation_MWh</span>
+<span id="cb62-9"><a href="#cb62-9" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb62-10"><a href="#cb62-10" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb62-11"><a href="#cb62-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb62-12"><a href="#cb62-12" aria-hidden="true" tabindex="-1"></a>EIA_US_CO2_AVERAGE</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  weighted_CO2_average
 1             784.8565</code></pre>
@@ -2462,23 +2463,23 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
 <span id="cb70-24"><a href="#cb70-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">row.striping.background_color =</span> <span class="st">"#E8E8E8"</span></span>
 <span id="cb70-25"><a href="#cb70-25" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
-<div id="ylkrgdiwpr" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#ylkrgdiwpr table {
+<div id="cajjaaxbwl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#cajjaaxbwl table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#ylkrgdiwpr thead, #ylkrgdiwpr tbody, #ylkrgdiwpr tfoot, #ylkrgdiwpr tr, #ylkrgdiwpr td, #ylkrgdiwpr th {
+#cajjaaxbwl thead, #cajjaaxbwl tbody, #cajjaaxbwl tfoot, #cajjaaxbwl tr, #cajjaaxbwl td, #cajjaaxbwl th {
   border-style: none;
 }
 
-#ylkrgdiwpr p {
+#cajjaaxbwl p {
   margin: 0;
   padding: 0;
 }
 
-#ylkrgdiwpr .gt_table {
+#cajjaaxbwl .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -2504,12 +2505,12 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   border-left-color: #D3D3D3;
 }
 
-#ylkrgdiwpr .gt_caption {
+#cajjaaxbwl .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#ylkrgdiwpr .gt_title {
+#cajjaaxbwl .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2521,7 +2522,7 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   border-bottom-width: 0;
 }
 
-#ylkrgdiwpr .gt_subtitle {
+#cajjaaxbwl .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2533,7 +2534,7 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   border-top-width: 0;
 }
 
-#ylkrgdiwpr .gt_heading {
+#cajjaaxbwl .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2545,13 +2546,13 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   border-right-color: #D3D3D3;
 }
 
-#ylkrgdiwpr .gt_bottom_border {
+#cajjaaxbwl .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#ylkrgdiwpr .gt_col_headings {
+#cajjaaxbwl .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2566,7 +2567,7 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   border-right-color: #D3D3D3;
 }
 
-#ylkrgdiwpr .gt_col_heading {
+#cajjaaxbwl .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2586,7 +2587,7 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   overflow-x: hidden;
 }
 
-#ylkrgdiwpr .gt_column_spanner_outer {
+#cajjaaxbwl .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2598,15 +2599,15 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   padding-right: 4px;
 }
 
-#ylkrgdiwpr .gt_column_spanner_outer:first-child {
+#cajjaaxbwl .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#ylkrgdiwpr .gt_column_spanner_outer:last-child {
+#cajjaaxbwl .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#ylkrgdiwpr .gt_column_spanner {
+#cajjaaxbwl .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -2618,11 +2619,11 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   width: 100%;
 }
 
-#ylkrgdiwpr .gt_spanner_row {
+#cajjaaxbwl .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#ylkrgdiwpr .gt_group_heading {
+#cajjaaxbwl .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2648,7 +2649,7 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   text-align: left;
 }
 
-#ylkrgdiwpr .gt_empty_group_heading {
+#cajjaaxbwl .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2663,15 +2664,15 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   vertical-align: middle;
 }
 
-#ylkrgdiwpr .gt_from_md > :first-child {
+#cajjaaxbwl .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#ylkrgdiwpr .gt_from_md > :last-child {
+#cajjaaxbwl .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#ylkrgdiwpr .gt_row {
+#cajjaaxbwl .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2690,7 +2691,7 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   overflow-x: hidden;
 }
 
-#ylkrgdiwpr .gt_stub {
+#cajjaaxbwl .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2703,7 +2704,7 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   padding-right: 5px;
 }
 
-#ylkrgdiwpr .gt_stub_row_group {
+#cajjaaxbwl .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2717,15 +2718,15 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   vertical-align: top;
 }
 
-#ylkrgdiwpr .gt_row_group_first td {
+#cajjaaxbwl .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#ylkrgdiwpr .gt_row_group_first th {
+#cajjaaxbwl .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#ylkrgdiwpr .gt_summary_row {
+#cajjaaxbwl .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2735,16 +2736,16 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   padding-right: 5px;
 }
 
-#ylkrgdiwpr .gt_first_summary_row {
+#cajjaaxbwl .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#ylkrgdiwpr .gt_first_summary_row.thick {
+#cajjaaxbwl .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#ylkrgdiwpr .gt_last_summary_row {
+#cajjaaxbwl .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2754,7 +2755,7 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   border-bottom-color: #D3D3D3;
 }
 
-#ylkrgdiwpr .gt_grand_summary_row {
+#cajjaaxbwl .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2764,7 +2765,7 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   padding-right: 5px;
 }
 
-#ylkrgdiwpr .gt_first_grand_summary_row {
+#cajjaaxbwl .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2774,7 +2775,7 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   border-top-color: #D3D3D3;
 }
 
-#ylkrgdiwpr .gt_last_grand_summary_row_top {
+#cajjaaxbwl .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2784,11 +2785,11 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   border-bottom-color: #D3D3D3;
 }
 
-#ylkrgdiwpr .gt_striped {
+#cajjaaxbwl .gt_striped {
   background-color: #E8E8E8;
 }
 
-#ylkrgdiwpr .gt_table_body {
+#cajjaaxbwl .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2797,7 +2798,7 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   border-bottom-color: #D3D3D3;
 }
 
-#ylkrgdiwpr .gt_footnotes {
+#cajjaaxbwl .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2811,7 +2812,7 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   border-right-color: #D3D3D3;
 }
 
-#ylkrgdiwpr .gt_footnote {
+#cajjaaxbwl .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -2820,7 +2821,7 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   padding-right: 5px;
 }
 
-#ylkrgdiwpr .gt_sourcenotes {
+#cajjaaxbwl .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2834,7 +2835,7 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   border-right-color: #D3D3D3;
 }
 
-#ylkrgdiwpr .gt_sourcenote {
+#cajjaaxbwl .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -2842,72 +2843,72 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
   padding-right: 5px;
 }
 
-#ylkrgdiwpr .gt_left {
+#cajjaaxbwl .gt_left {
   text-align: left;
 }
 
-#ylkrgdiwpr .gt_center {
+#cajjaaxbwl .gt_center {
   text-align: center;
 }
 
-#ylkrgdiwpr .gt_right {
+#cajjaaxbwl .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#ylkrgdiwpr .gt_font_normal {
+#cajjaaxbwl .gt_font_normal {
   font-weight: normal;
 }
 
-#ylkrgdiwpr .gt_font_bold {
+#cajjaaxbwl .gt_font_bold {
   font-weight: bold;
 }
 
-#ylkrgdiwpr .gt_font_italic {
+#cajjaaxbwl .gt_font_italic {
   font-style: italic;
 }
 
-#ylkrgdiwpr .gt_super {
+#cajjaaxbwl .gt_super {
   font-size: 65%;
 }
 
-#ylkrgdiwpr .gt_footnote_marks {
+#cajjaaxbwl .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#ylkrgdiwpr .gt_asterisk {
+#cajjaaxbwl .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#ylkrgdiwpr .gt_indent_1 {
+#cajjaaxbwl .gt_indent_1 {
   text-indent: 5px;
 }
 
-#ylkrgdiwpr .gt_indent_2 {
+#cajjaaxbwl .gt_indent_2 {
   text-indent: 10px;
 }
 
-#ylkrgdiwpr .gt_indent_3 {
+#cajjaaxbwl .gt_indent_3 {
   text-indent: 15px;
 }
 
-#ylkrgdiwpr .gt_indent_4 {
+#cajjaaxbwl .gt_indent_4 {
   text-indent: 20px;
 }
 
-#ylkrgdiwpr .gt_indent_5 {
+#cajjaaxbwl .gt_indent_5 {
   text-indent: 25px;
 }
 
-#ylkrgdiwpr .katex-display {
+#cajjaaxbwl .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#ylkrgdiwpr div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#cajjaaxbwl div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -2988,7 +2989,7 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
 </div>
 </div>
 </div>
-<p>From the table above we see that is the rarest energy source among the whole dataset is Petroleum with only one state using it. Meanwhile, the two other rarest sources Hydroelectric and Wind each have 4 states that uses it as a primary energy source. This table can be particularly valuable when we want to identify states that uses more of a “Unique” energy source and how they compare to other states that uses something more common.</p>
+<p>From the table above we see that is the rarest energy source among the whole dataset is Petroleum with only one state using it. Meanwhile, the two other rarest sources Hydroelectric and Wind each have 4 states that uses it as a primary energy source. This table can be particularly valuable when we want to identify states that uses more of a “unique” energy source and how they compare to other states that uses something more common.</p>
 </section>
 <section id="how-many-times-cleaner-is-nys-energy-mix-than-that-of-texas-inline-answer" class="level4">
 <h4 class="anchored" data-anchor-id="how-many-times-cleaner-is-nys-energy-mix-than-that-of-texas-inline-answer">How many times cleaner is NY’s energy mix than that of Texas? (Inline answer)</h4>
@@ -3005,7 +3006,7 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
 1 New York     537
 2    Texas     823</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We now compare to the two values</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We now compare the two values</span></span>
 <span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb73-3"><a href="#cb73-3" aria-hidden="true" tabindex="-1"></a>EIA_NY_CLEANER <span class="ot">&lt;-</span> EIA_NY_TEXAS <span class="sc">|&gt;</span></span>
 <span id="cb73-4"><a href="#cb73-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
@@ -3094,7 +3095,7 @@ $ sum_passenger_miles       &lt;dbl&gt; 7951559, 1881154, 2339926, 261633653, 40
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb81"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a>NTD_ZERO_SOURCES <span class="ot">&lt;-</span> NTD_ZERO_SOURCE_COUNTS <span class="sc">|&gt;</span></span>
 <span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(energy_source)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>Based on both outputs if we were to consider fuels with no amounts reported then, <strong>Gallons of Bunker Fuel</strong> and <strong>Gallons of Kerosene</strong> would be considered the least commonly used fuel source for U.S. public transit. If we are considering only reported amounts it would be <strong>Gallons of Liquified Nat Gas</strong> with only 1 agency reporting it’s usage. These results give us an idea of how certain rare or common some fuel sources regarding their usage.</p>
+<p>Based on both outputs if we were to consider fuels with no amounts reported, <strong>Gallons of Bunker Fuel</strong> and <strong>Gallons of Kerosene</strong> would be considered the least commonly used fuel source for U.S. public transit. If we are considering only reported amounts it would be <strong>Gallons of Liquified Nat Gas</strong> with only 1 agency reporting it’s usage. These results give us an idea of how certain rare or common some fuel sources regarding their usage.</p>
 </section>
 <section id="which-five-states-has-the-fewest-total-miles-traveled-by-public-transit-graph-answer" class="level4">
 <h4 class="anchored" data-anchor-id="which-five-states-has-the-fewest-total-miles-traveled-by-public-transit-graph-answer">Which five states has the fewest total miles traveled by public transit? (Graph answer)</h4>
@@ -3562,23 +3563,23 @@ $ uza_name                                &lt;chr&gt; "Seattle--Tacoma, WA", "Se
 <span id="cb119-19"><a href="#cb119-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">row.striping.background_color =</span> <span class="st">"#D6D6D6"</span></span>
 <span id="cb119-20"><a href="#cb119-20" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
-<div id="qougrzgyxm" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#qougrzgyxm table {
+<div id="vlavsqqafu" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#vlavsqqafu table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#qougrzgyxm thead, #qougrzgyxm tbody, #qougrzgyxm tfoot, #qougrzgyxm tr, #qougrzgyxm td, #qougrzgyxm th {
+#vlavsqqafu thead, #vlavsqqafu tbody, #vlavsqqafu tfoot, #vlavsqqafu tr, #vlavsqqafu td, #vlavsqqafu th {
   border-style: none;
 }
 
-#qougrzgyxm p {
+#vlavsqqafu p {
   margin: 0;
   padding: 0;
 }
 
-#qougrzgyxm .gt_table {
+#vlavsqqafu .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -3604,12 +3605,12 @@ $ uza_name                                &lt;chr&gt; "Seattle--Tacoma, WA", "Se
   border-left-color: #D3D3D3;
 }
 
-#qougrzgyxm .gt_caption {
+#vlavsqqafu .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#qougrzgyxm .gt_title {
+#vlavsqqafu .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -3621,7 +3622,7 @@ $ uza_name                                &lt;chr&gt; "Seattle--Tacoma, WA", "Se
   border-bottom-width: 0;
 }
 
-#qougrzgyxm .gt_subtitle {
+#vlavsqqafu .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -3633,7 +3634,7 @@ $ uza_name                                &lt;chr&gt; "Seattle--Tacoma, WA", "Se
   border-top-width: 0;
 }
 
-#qougrzgyxm .gt_heading {
+#vlavsqqafu .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -3645,13 +3646,13 @@ $ uza_name                                &lt;chr&gt; "Seattle--Tacoma, WA", "Se
   border-right-color: #D3D3D3;
 }
 
-#qougrzgyxm .gt_bottom_border {
+#vlavsqqafu .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#qougrzgyxm .gt_col_headings {
+#vlavsqqafu .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3666,7 +3667,7 @@ $ uza_name                                &lt;chr&gt; "Seattle--Tacoma, WA", "Se
   border-right-color: #D3D3D3;
 }
 
-#qougrzgyxm .gt_col_heading {
+#vlavsqqafu .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3686,7 +3687,7 @@ $ uza_name                                &lt;chr&gt; "Seattle--Tacoma, WA", "Se
   overflow-x: hidden;
 }
 
-#qougrzgyxm .gt_column_spanner_outer {
+#vlavsqqafu .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3698,15 +3699,15 @@ $ uza_name                                &lt;chr&gt; "Seattle--Tacoma, WA", "Se
   padding-right: 4px;
 }
 
-#qougrzgyxm .gt_column_spanner_outer:first-child {
+#vlavsqqafu .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#qougrzgyxm .gt_column_spanner_outer:last-child {
+#vlavsqqafu .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#qougrzgyxm .gt_column_spanner {
+#vlavsqqafu .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -3718,11 +3719,11 @@ $ uza_name                                &lt;chr&gt; "Seattle--Tacoma, WA", "Se
   width: 100%;
 }
 
-#qougrzgyxm .gt_spanner_row {
+#vlavsqqafu .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#qougrzgyxm .gt_group_heading {
+#vlavsqqafu .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3748,7 +3749,7 @@ $ uza_name                                &lt;chr&gt; "Seattle--Tacoma, WA", "Se
   text-align: left;
 }
 
-#qougrzgyxm .gt_empty_group_heading {
+#vlavsqqafu .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3763,15 +3764,15 @@ $ uza_name                                &lt;chr&gt; "Seattle--Tacoma, WA", "Se
   vertical-align: middle;
 }
 
-#qougrzgyxm .gt_from_md > :first-child {
+#vlavsqqafu .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#qougrzgyxm .gt_from_md > :last-child {
+#vlavsqqafu .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#qougrzgyxm .gt_row {
+#vlavsqqafu .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3790,7 +3791,7 @@ $ uza_name                                &lt;chr&gt; "Seattle--Tacoma, WA", "Se
   overflow-x: hidden;
 }
 
-#qougrzgyxm .gt_stub {
+#vlavsqqafu .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3803,7 +3804,7 @@ $ uza_name                                &lt;chr&gt; "Seattle--Tacoma, WA", "Se
   padding-right: 5px;
 }
 
-#qougrzgyxm .gt_stub_row_group {
+#vlavsqqafu .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3817,15 +3818,15 @@ $ uza_name                                &lt;chr&gt; "Seattle--Tacoma, WA", "Se
   vertical-align: top;
 }
 
-#qougrzgyxm .gt_row_group_first td {
+#vlavsqqafu .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#qougrzgyxm .gt_row_group_first th {
+#vlavsqqafu .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#qougrzgyxm .gt_summary_row {
+#vlavsqqafu .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3835,16 +3836,16 @@ $ uza_name                                &lt;chr&gt; "Seattle--Tacoma, WA", "Se
   padding-right: 5px;
 }
 
-#qougrzgyxm .gt_first_summary_row {
+#vlavsqqafu .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#qougrzgyxm .gt_first_summary_row.thick {
+#vlavsqqafu .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#qougrzgyxm .gt_last_summary_row {
+#vlavsqqafu .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3854,7 +3855,7 @@ $ uza_name                                &lt;chr&gt; "Seattle--Tacoma, WA", "Se
   border-bottom-color: #D3D3D3;
 }
 
-#qougrzgyxm .gt_grand_summary_row {
+#vlavsqqafu .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3864,7 +3865,7 @@ $ uza_name                                &lt;chr&gt; "Seattle--Tacoma, WA", "Se
   padding-right: 5px;
 }
 
-#qougrzgyxm .gt_first_grand_summary_row {
+#vlavsqqafu .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3874,7 +3875,7 @@ $ uza_name                                &lt;chr&gt; "Seattle--Tacoma, WA", "Se
   border-top-color: #D3D3D3;
 }
 
-#qougrzgyxm .gt_last_grand_summary_row_top {
+#vlavsqqafu .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3884,11 +3885,11 @@ $ uza_name                                &lt;chr&gt; "Seattle--Tacoma, WA", "Se
   border-bottom-color: #D3D3D3;
 }
 
-#qougrzgyxm .gt_striped {
+#vlavsqqafu .gt_striped {
   background-color: #D6D6D6;
 }
 
-#qougrzgyxm .gt_table_body {
+#vlavsqqafu .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3897,7 +3898,7 @@ $ uza_name                                &lt;chr&gt; "Seattle--Tacoma, WA", "Se
   border-bottom-color: #D3D3D3;
 }
 
-#qougrzgyxm .gt_footnotes {
+#vlavsqqafu .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3911,7 +3912,7 @@ $ uza_name                                &lt;chr&gt; "Seattle--Tacoma, WA", "Se
   border-right-color: #D3D3D3;
 }
 
-#qougrzgyxm .gt_footnote {
+#vlavsqqafu .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -3920,7 +3921,7 @@ $ uza_name                                &lt;chr&gt; "Seattle--Tacoma, WA", "Se
   padding-right: 5px;
 }
 
-#qougrzgyxm .gt_sourcenotes {
+#vlavsqqafu .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3934,7 +3935,7 @@ $ uza_name                                &lt;chr&gt; "Seattle--Tacoma, WA", "Se
   border-right-color: #D3D3D3;
 }
 
-#qougrzgyxm .gt_sourcenote {
+#vlavsqqafu .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -3942,72 +3943,72 @@ $ uza_name                                &lt;chr&gt; "Seattle--Tacoma, WA", "Se
   padding-right: 5px;
 }
 
-#qougrzgyxm .gt_left {
+#vlavsqqafu .gt_left {
   text-align: left;
 }
 
-#qougrzgyxm .gt_center {
+#vlavsqqafu .gt_center {
   text-align: center;
 }
 
-#qougrzgyxm .gt_right {
+#vlavsqqafu .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#qougrzgyxm .gt_font_normal {
+#vlavsqqafu .gt_font_normal {
   font-weight: normal;
 }
 
-#qougrzgyxm .gt_font_bold {
+#vlavsqqafu .gt_font_bold {
   font-weight: bold;
 }
 
-#qougrzgyxm .gt_font_italic {
+#vlavsqqafu .gt_font_italic {
   font-style: italic;
 }
 
-#qougrzgyxm .gt_super {
+#vlavsqqafu .gt_super {
   font-size: 65%;
 }
 
-#qougrzgyxm .gt_footnote_marks {
+#vlavsqqafu .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#qougrzgyxm .gt_asterisk {
+#vlavsqqafu .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#qougrzgyxm .gt_indent_1 {
+#vlavsqqafu .gt_indent_1 {
   text-indent: 5px;
 }
 
-#qougrzgyxm .gt_indent_2 {
+#vlavsqqafu .gt_indent_2 {
   text-indent: 10px;
 }
 
-#qougrzgyxm .gt_indent_3 {
+#vlavsqqafu .gt_indent_3 {
   text-indent: 15px;
 }
 
-#qougrzgyxm .gt_indent_4 {
+#vlavsqqafu .gt_indent_4 {
   text-indent: 20px;
 }
 
-#qougrzgyxm .gt_indent_5 {
+#vlavsqqafu .gt_indent_5 {
   text-indent: 25px;
 }
 
-#qougrzgyxm .katex-display {
+#vlavsqqafu .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#qougrzgyxm div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#vlavsqqafu div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>

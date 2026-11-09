@@ -154,7 +154,7 @@ load_ntd_energy <- function(){
 NTD_ENERGY <- load_ntd_energy()
 ```
 
-We received a warning when obtaining the second data set. The warning is saying that at least one of our values could not be converted into a number. The following code is to inspect it. We found the warning is regarding the mutate function that we are using. The column "Bio-Diesel Description" in our modified and raw data stood out the most being that the original values were strings, and the modified values are numerical with zeros. This column is the likely culprit. The other columns (with non numeric text values) were excluded during the data modification process, thus can not be the reason for the warning.
+We received a warning when obtaining the second data set. The warning is saying that at least one of our values could not be converted into a number. The following code is to inspect it. We found the warning is regarding the mutate function that we are using. The column "Bio-Diesel Description" in our modified and raw data stood out the most being that the original values are strings, and the modified values are numerical with zeros. This column is the likely culprit. The other columns (with non numeric text values) were excluded during the data modification process, thus can not be the reason for the warning.
 
 ```{r}
 dplyr::last_dplyr_warnings()
@@ -267,7 +267,7 @@ NTD_SERVICE |>
   dplyr::arrange(mode)
 ```
   
-Now that we know what coding to modify under the "mode" column for both datasets, we will now modify those values. Instead of altering the original modified datasets, we will create two new ones that will have those modified values, and will use those going forward.This will ensure that if anything goes wrong, we still have our original modified data and won't have to re run any code regarding data acquisition or initial modification. 
+Now that we know what coding to modify under the "mode" column for both datasets, we will modify those values. Instead of altering the original modified datasets, we will create two new ones that will have those modified values, and will use those going forward. This will ensure that if anything goes wrong, we still have our original modified data and won't have to re run any code regarding data acquisition or initial modification. 
 
 ```{r}
 NTD_ENERGY_Modified <- NTD_ENERGY |>
@@ -396,7 +396,8 @@ As can be seen from the table above, `r EIA_DIRTIEST_STATES[1]` is the most "dir
 #### On average, how many pounds of CO2 are emitted per MWh of electricity produced in the U.S.? (Note that we will need use a suitably weighted average here.) (Inline answer)
 
 ```{r}
-# Here calculate the weighted average. The weight is based on the total amount of electricity that each state generates.
+# Here we calculate the weighted average. 
+# The weight is based on the total amount of electricity that each state generates.
 
 EIA_US_CO2_AVERAGE <- EIA_SEP_REPORT |>
   summarize(
@@ -473,7 +474,7 @@ EIA_RAREST_SOURCE_DETAILS |>
   )
 ```
 
-From the table above we see that is the rarest energy source among the whole dataset is `r EIA_RAREST_SOURCE_NAMES[1]` with only one state using it. Meanwhile, the two other rarest sources `r EIA_RAREST_SOURCE_NAMES[2]` and `r EIA_RAREST_SOURCE_NAMES[3]` each have 4 states that uses it as a primary energy source. This table can be particularly valuable when we want to identify states that uses more of a "Unique" energy source and how they compare to other states that uses something more common. 
+From the table above we see that is the rarest energy source among the whole dataset is `r EIA_RAREST_SOURCE_NAMES[1]` with only one state using it. Meanwhile, the two other rarest sources `r EIA_RAREST_SOURCE_NAMES[2]` and `r EIA_RAREST_SOURCE_NAMES[3]` each have 4 states that uses it as a primary energy source. This table can be particularly valuable when we want to identify states that uses more of a "unique" energy source and how they compare to other states that uses something more common. 
 
 #### How many times cleaner is NY’s energy mix than that of Texas? (Inline answer)
 
@@ -486,7 +487,7 @@ EIA_NY_TEXAS <- EIA_SEP_REPORT |>
 
 EIA_NY_TEXAS
 
-# We now compare to the two values
+# We now compare the two values
 
 EIA_NY_CLEANER <- EIA_NY_TEXAS |>
   summarize(
@@ -557,7 +558,7 @@ NTD_ZERO_SOURCES <- NTD_ZERO_SOURCE_COUNTS |>
   pull(energy_source)
 ```
   
-Based on both outputs if we were to consider fuels with no amounts reported then, **`r NTD_ZERO_SOURCES[1]`** and  **`r NTD_ZERO_SOURCES[2]`** would be considered the least commonly used fuel source for U.S. public transit. If we are considering only reported amounts it would be **`r NTD_LEAST_USED_SOURCE`** with only 1 agency reporting it's usage. These results give us an idea of how certain rare or common some fuel sources regarding their usage.
+Based on both outputs if we were to consider fuels with no amounts reported, **`r NTD_ZERO_SOURCES[1]`** and  **`r NTD_ZERO_SOURCES[2]`** would be considered the least commonly used fuel source for U.S. public transit. If we are considering only reported amounts it would be **`r NTD_LEAST_USED_SOURCE`** with only 1 agency reporting it's usage. These results give us an idea of how certain rare or common some fuel sources regarding their usage.
 
 #### Which five states has the fewest total miles traveled by public transit? (Graph answer)
 
@@ -624,7 +625,7 @@ NTD_STATE_MILES |>
 As can be seen from the above graph `r NTD_FEWEST_STATES[1]` have the fewest total miles traveled by public transit.
 `r NTD_FEWEST_STATES[2]`, `r NTD_FEWEST_STATES[3]`, `r NTD_FEWEST_STATES[4]`, and `r NTD_FEWEST_STATES[5]` follows behind. 
 
-Regarding this specific dataset, certain rows were flagged as "inaccurate" by the Federal Transit Administration. Just to see what our results would look like if we were to filter out those rows, we re ran the same code excluding those rows. As can be seen below, We end up producing the same results. This strengthen our finding in that the flagged rows do not alter our results. 
+Regarding this specific dataset, certain rows were flagged as "inaccurate" by the Federal Transit Administration (FTA). Just to see what our results would look like if we were to filter out those rows, we re ran the same code excluding those rows. As can be seen below, We end up producing the same results. This strengthen our finding in that the flagged rows do not alter our results. 
 
 ```{r}
 NTD_STATE_MILES <- NTD_SERVICE_Modified |>
